@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叶子接收游戏</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            background-color: #87CEEB;
+            position: relative;
+        }
+        .item {
+            position: absolute;
+            cursor: pointer;
+            user-select: none;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: white;
+        }
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: white;
+        }
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="score">分数: 0</div>
+        <div id="timer">时间: 15</div>
+        <div id="game-over">游戏结束</div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const gameOverElement = document.getElementById('game-over');
+
+        let score = 0;
+        let timeLeft = 15;
+        let gameInterval;
+
+        function createItem(isLeaf) {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerHTML = isLeaf ? '🍃' : '💣';
+            item.style.fontSize = '40px';
+            item.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            item.style.top = '-40px';
+
+            item.addEventListener('click', () => {
+                if (isLeaf) {
+                    score++;
+                    scoreElement.textContent = `分数: ${score}`;
+                } else {
+                    score = 0;
+                    scoreElement.textContent = `分数: ${score}`;
+                }
+                gameContainer.removeChild(item);
+            });
+
+            gameContainer.appendChild(item);
+
+            let position = -40;
+            const fallInterval = setInterval(() => {
+                position += 2;
+                item.style.top = position + 'px';
+
+                if (position > window.innerHeight) {
+                    clearInterval(fallInterval);
+                    gameContainer.removeChild(item);
+                }
+            }, 20);
+        }
+
+        function startGame() {
+            gameInterval = setInterval(() => {
+                if (Math.random() < 0.8) {
+                    createItem(true);
+                } else {
+                    createItem(false);
+                }
+
+                timeLeft--;
+                timerElement.textContent = `时间: ${timeLeft}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    gameOverElement.style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
